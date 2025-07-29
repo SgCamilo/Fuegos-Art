@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fuegos de Amor</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000000;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+    }
+    .love-message {
+      position: absolute;
+      font-size: 26px;
+      font-weight: bold;
+      opacity: 0;
+      animation: fade 3s forwards;
+      text-shadow: 0 0 10px hotpink;
+    }
+    @keyframes fade {
+      0% {
+        opacity: 0;
+        transform: translateY(0);
+      }
+      50% {
+        opacity: 1;
+        transform: translateY(-60px);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-120px);
+      }
+    }
+    h1 {
+      text-align: center;
+      color: hotpink;
+      margin-top: 20px;
+      text-shadow: 0 0 20px #ff69b4;
+    }
+  </style>
+</head>
+<body>
+  <h1>✨ Eres el latido de mi corazón ✨</h1>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const messages = [
+      "Te amo 💖",
+      "Eres mi sueño hecho realidad",
+      "Mi vida cambió contigo",
+      "Siempre tú",
+      "Mi razón de sonreír",
+      "Te elijo cada día",
+      "Tú y yo, por siempre"
+    ];
+
+    class HeartFirework {
+      constructor(x, y, color, text) {
+        this.x = x;
+        this.y = y;
+        this.radius = 2;
+        this.color = color;
+        this.text = text;
+        this.particles = [];
+
+        const heart = [
+          [0, -20], [14, -20], [20, -10], [20, 0],
+          [0, 20], [-20, 0], [-20, -10], [-14, -20], [0, -20]
+        ];
+
+        for (let i = 0; i < 100; i++) {
+          const t = Math.random();
+          const h = heart[Math.floor(t * heart.length)];
+          this.particles.push({
+            x: x,
+            y: y,
+            vx: (h[0] + (Math.random() - 0.5) * 5) / 5,
+            vy: (h[1] + (Math.random() - 0.5) * 5) / 5,
+            alpha: 1
+          });
+        }
+
+        this.showMessage();
+      }
+
+      showMessage() {
+        const el = document.createElement("div");
+        el.classList.add("love-message");
+        el.textContent = this.text;
+        el.style.left = `${this.x}px`;
+        el.style.top = `${this.y}px`;
+        el.style.color = this.color;
+        document.body.appendChild(el);
+
+        setTimeout(() => el.remove(), 3000);
+      }
+
+      update() {
+        this.particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= 0.02;
+        });
+      }
+
+      draw() {
+        this.particles.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, this.radius, 0, 2 * Math.PI);
+          ctx.fillStyle = `rgba(255, 105, 180, ${p.alpha})`;
+          ctx.fill();
+        });
+      }
+    }
+
+    const fireworks = [];
+
+    function animate() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      fireworks.forEach(f => {
+        f.update();
+        f.draw();
+      });
+    }
+
+    setInterval(() => {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height / 2;
+      const color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+      const text = messages[Math.floor(Math.random() * messages.length)];
+      fireworks.push(new HeartFirework(x, y, color, text));
+    }, 2000);
+
+    setInterval(animate, 30);
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
